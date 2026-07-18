@@ -248,6 +248,28 @@
     text-decoration:none;
     font-size:0.78rem;
   }
+  .player-bar .now-playing-group{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+  }
+  .player-bar .now-playing-group span#now-playing{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .nav-btn{
+    background:none;
+    border:1px solid #232a38;
+    color:var(--text);
+    border-radius:8px;
+    padding:4px 9px;
+    font-size:0.85rem;
+    cursor:pointer;
+    flex:0 0 auto;
+  }
+  .nav-btn:hover{border-color:var(--accent); color:var(--accent);}
   .close-btn{
     background:none;
     border:1px solid var(--muted);
@@ -287,7 +309,11 @@
 <div id="player-wrap">
   <div class="player-box">
     <div class="player-bar">
-      <span><span class="live-dot"></span><span id="now-playing">—</span></span>
+      <span class="now-playing-group">
+        <button id="btn-prev-ch" class="nav-btn" title="Προηγούμενο κανάλι">⏮</button>
+        <span><span class="live-dot"></span><span id="now-playing">—</span></span>
+        <button id="btn-next-ch" class="nav-btn" title="Επόμενο κανάλι">⏭</button>
+      </span>
       <div style="display:flex; gap:8px;">
         <a id="open-tab" href="#" target="_blank" rel="noopener">Άνοιγμα σε καρτέλα ↗</a>
         <button class="close-btn" onclick="closePlayer()">Κλείσιμο ✕</button>
@@ -422,14 +448,18 @@ function toggleFavorite(name, e){
   renderCategory(currentCat);
 }
 
+function getCategoryChannels(cat){
+  return cat === FAVORITES_CAT
+    ? [...favorites].map(name => allChannelsByName[name]).filter(Boolean)
+    : categories[cat];
+}
+
 function renderCategory(cat){
   currentCat = cat;
   titleEl.textContent = cat;
   gridEl.innerHTML = '';
 
-  const list = cat === FAVORITES_CAT
-    ? [...favorites].map(name => allChannelsByName[name]).filter(Boolean)
-    : categories[cat];
+  const list = getCategoryChannels(cat);
 
   if(cat === FAVORITES_CAT && list.length === 0){
     gridEl.innerHTML = '<p class="empty-fav">Δεν έχεις αγαπημένα κανάλια ακόμα. Πάτησε το ☆ πάνω σε ένα κανάλι για να το προσθέσεις εδώ.</p>';
@@ -544,7 +574,10 @@ function playHls(ch){
   }
 }
 
+let currentChannelName = null;
+
 function openPlayer(ch){
+  currentChannelName = ch.name;
   document.getElementById('player-wrap').classList.add('active');
   document.getElementById('now-playing').textContent = ch.name;
   document.getElementById('open-tab').href = ch.url;
@@ -563,6 +596,18 @@ function openPlayer(ch){
     frame.src = ch.url;
   }
 }
+
+function navigateChannel(delta){
+  const list = getCategoryChannels(currentCat);
+  if(!list || list.length === 0) return;
+  const idx = list.findIndex(c => c.name === currentChannelName);
+  if(idx === -1) return;
+  const nextIdx = (idx + delta + list.length) % list.length;
+  openPlayer(list[nextIdx]);
+}
+
+document.getElementById('btn-prev-ch').onclick = () => navigateChannel(-1);
+document.getElementById('btn-next-ch').onclick = () => navigateChannel(1);
 
 function closePlayer(){
   document.getElementById('player-wrap').classList.remove('active');
