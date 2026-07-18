@@ -105,6 +105,25 @@
     font-size:0.65rem;
     color:var(--muted);
   }
+  .card .star{
+    position:absolute;
+    top:4px; left:6px;
+    font-size:0.95rem;
+    line-height:1;
+    color:var(--muted);
+    z-index:2;
+  }
+  .card .star:hover{color:#f5c518;}
+  .card .star.active{color:#f5c518;}
+  .empty-fav{
+    max-width:950px;
+    margin:0 auto;
+    padding:20px 18px;
+    color:var(--muted);
+    font-size:0.85rem;
+    text-align:center;
+    grid-column:1/-1;
+  }
   .live-dot{
     display:inline-block;
     width:6px;height:6px;
@@ -294,19 +313,67 @@ const tabsEl = document.getElementById('tabs');
 const gridEl = document.getElementById('grid');
 const titleEl = document.getElementById('cat-title');
 const catNames = Object.keys(categories);
+const FAVORITES_CAT = "★ Αγαπημένα";
+const FAV_KEY = "greek-tv-favorites";
+
+const allChannelsByName = {};
+Object.values(categories).forEach(list => list.forEach(ch => { allChannelsByName[ch.name] = ch; }));
+
+function loadFavorites(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(FAV_KEY));
+    return new Set(Array.isArray(raw) ? raw : []);
+  }catch(e){
+    return new Set();
+  }
+}
+function saveFavorites(){
+  localStorage.setItem(FAV_KEY, JSON.stringify([...favorites]));
+}
+
+let favorites = loadFavorites();
+let currentCat = catNames[0];
+
+function toggleFavorite(name, e){
+  e.stopPropagation();
+  if(favorites.has(name)) favorites.delete(name);
+  else favorites.add(name);
+  saveFavorites();
+  renderCategory(currentCat);
+}
 
 function renderCategory(cat){
+  currentCat = cat;
   titleEl.textContent = cat;
   gridEl.innerHTML = '';
-  categories[cat].forEach(ch => {
-    const card = document.createElement('div');
-    card.className = 'card' + (knownDomains.has(ch.name) ? '' : ' unverified');
-    card.innerHTML = `<div class="logo">${ch.name}</div><div class="tag"><span class="live-dot"></span>Live</div>`;
-    card.onclick = () => openPlayer(ch);
-    gridEl.appendChild(card);
-  });
+
+  const list = cat === FAVORITES_CAT
+    ? [...favorites].map(name => allChannelsByName[name]).filter(Boolean)
+    : categories[cat];
+
+  if(cat === FAVORITES_CAT && list.length === 0){
+    gridEl.innerHTML = '<p class="empty-fav">Δεν έχεις αγαπημένα κανάλια ακόμα. Πάτησε το ☆ πάνω σε ένα κανάλι για να το προσθέσεις εδώ.</p>';
+  } else {
+    list.forEach(ch => {
+      const isFav = favorites.has(ch.name);
+      const card = document.createElement('div');
+      card.className = 'card' + (knownDomains.has(ch.name) ? '' : ' unverified');
+      card.innerHTML = `<span class="star${isFav ? ' active' : ''}">${isFav ? '★' : '☆'}</span><div class="logo">${ch.name}</div><div class="tag"><span class="live-dot"></span>Live</div>`;
+      card.onclick = () => openPlayer(ch);
+      card.querySelector('.star').onclick = (e) => toggleFavorite(ch.name, e);
+      gridEl.appendChild(card);
+    });
+  }
+
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.cat === cat));
 }
+
+const favTab = document.createElement('div');
+favTab.className = 'tab';
+favTab.textContent = FAVORITES_CAT;
+favTab.dataset.cat = FAVORITES_CAT;
+favTab.onclick = () => renderCategory(FAVORITES_CAT);
+tabsEl.appendChild(favTab);
 
 catNames.forEach(cat => {
   const tab = document.createElement('div');
