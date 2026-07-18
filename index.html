@@ -243,9 +243,11 @@
   .player-box:fullscreen .video-controls,
   .player-box:-webkit-full-screen .video-controls{
     position:absolute;
-    left:0; right:0; bottom:0;
-    background:linear-gradient(transparent, rgba(0,0,0,0.85));
+    inset:0;
+    background:rgba(0,0,0,0.45);
     border-top:none;
+    justify-content:center;
+    gap:32px;
     opacity:0;
     pointer-events:none;
     transition:opacity 0.2s ease;
@@ -254,6 +256,38 @@
   .player-box.controls-visible:-webkit-full-screen .video-controls{
     opacity:1;
     pointer-events:auto;
+  }
+  .player-box:fullscreen .vc-btn,
+  .player-box:-webkit-full-screen .vc-btn{
+    font-size:2.2rem;
+    padding:10px 16px;
+  }
+  .player-box:fullscreen .nav-btn,
+  .player-box:-webkit-full-screen .nav-btn{
+    font-size:1.7rem;
+    padding:12px 20px;
+    border-width:2px;
+    border-radius:12px;
+  }
+  .player-box:fullscreen .vc-volume-wrap,
+  .player-box:-webkit-full-screen .vc-volume-wrap{
+    width:28px;
+    height:100px;
+  }
+  .player-box:fullscreen .vc-volume,
+  .player-box:-webkit-full-screen .vc-volume{
+    width:100px;
+    height:24px;
+  }
+  .player-box:fullscreen .vc-live,
+  .player-box:-webkit-full-screen .vc-live{
+    position:absolute;
+    top:22px; right:22px;
+    margin-left:0;
+    font-size:0.9rem;
+    background:rgba(0,0,0,0.55);
+    padding:7px 14px;
+    border-radius:20px;
   }
   .player-error{
     padding:26px 18px;
@@ -352,7 +386,7 @@
     </div>
     <iframe id="frame" src="" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
     <div id="player-error" class="player-error" style="display:none">
-      <p>Δεν ήταν δυνατή η άμεση αναπαραγωγή εδώ (πιθανός γεωγραφικός περιορισμός από το κανάλι).</p>
+      <p id="error-message">Δεν ήταν δυνατή η άμεση αναπαραγωγή εδώ (πιθανός γεωγραφικός περιορισμός από το κανάλι).</p>
       <a id="error-open" href="#" target="_blank" rel="noopener">Άνοιγμα επίσημης σελίδας ↗</a>
     </div>
     <div class="video-controls" id="video-controls">
@@ -429,10 +463,10 @@ const categories = {
   "Κινηματογράφος": [
     { name:"Netmax", url:"https://netmaxtv.com/live/" },
     { name:"Choice TV", url:"https://www.choicetv.gr/live" },
-    { name:"Ant1 Drama", url:g("Ant1 Drama channel live") },
-    { name:"ANT1 Comedy", url:g("ANT1 Comedy channel live") },
-    { name:"Cinema Classics", url:g("Cinema Classics channel live") },
-    { name:"Sierra Channel", url:"https://www.tvgreeklive.com/channel/sierra-channel" },
+    { name:"Ant1 Drama", url:"https://www.antenna.gr/livedrama" },
+    { name:"ANT1 Comedy", url:"https://www.antenna.gr/livecomedy" },
+    { name:"Cinema Classics", url:"https://www.tvgreeklive.com/channel/cinema-classics", noEmbed:true },
+    { name:"Sierra Channel", url:"https://netnix.tv/countries/gr/channels/sierra-channel", noEmbed:true },
   ],
 };
 
@@ -441,7 +475,7 @@ const knownDomains = new Set([
   "Action 24","Kontra","Naftemporiki TV","One Channel","Blue Sky",
   "ΕΡΤ Sports 1","ΕΡΤ Sports 2","ΕΡΤ Sports 3","Mad TV",
   "ΕΡΤ 90s Radio","ΕΡΤ Vintage Radio","ΕΡΤ 80s Radio","ΕΡΤ Kids",
-  "Netmax","Choice TV"
+  "Netmax","Choice TV","Ant1 Drama","ANT1 Comedy"
 ]);
 
 const tabsEl = document.getElementById('tabs');
@@ -607,13 +641,18 @@ function stopVideo(){
   videoWrap.style.display = 'none';
 }
 
-function showPlayerError(ch){
+function showFallback(ch, message){
   stopVideo();
   document.getElementById('frame').style.display = 'none';
   document.getElementById('frame').src = '';
+  document.getElementById('error-message').textContent = message;
   document.getElementById('error-open').href = ch.url;
   document.getElementById('player-error').style.display = 'block';
   document.getElementById('video-controls').classList.add('iframe-mode');
+}
+
+function showPlayerError(ch){
+  showFallback(ch, 'Δεν ήταν δυνατή η άμεση αναπαραγωγή εδώ (πιθανός γεωγραφικός περιορισμός από το κανάλι).');
 }
 
 function tryPlayUnmuted(){
@@ -664,7 +703,9 @@ function openPlayer(ch){
   const frame = document.getElementById('frame');
   document.getElementById('video-controls').classList.toggle('iframe-mode', !ch.hls);
 
-  if(ch.hls){
+  if(ch.noEmbed){
+    showFallback(ch, 'Αυτό το κανάλι δεν επιτρέπει ενσωμάτωση εδώ — άνοιξέ το στην πραγματική του σελίδα.');
+  } else if(ch.hls){
     frame.style.display = 'none';
     frame.src = '';
     playHls(ch);
