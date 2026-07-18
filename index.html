@@ -713,6 +713,19 @@ function openPlayer(ch){
     frame.style.display = 'block';
     frame.src = ch.url;
   }
+
+  scheduleAutoFullscreen();
+}
+
+let autoFullscreenTimer = null;
+
+function scheduleAutoFullscreen(){
+  clearTimeout(autoFullscreenTimer);
+  autoFullscreenTimer = setTimeout(() => {
+    if(isFullscreen()) return;
+    const req = (playerBox.requestFullscreen || playerBox.webkitRequestFullscreen).call(playerBox);
+    if(req && req.catch) req.catch(() => {});
+  }, 10000);
 }
 
 function navigateChannel(delta){
@@ -728,6 +741,7 @@ document.getElementById('btn-prev-ch').onclick = () => navigateChannel(-1);
 document.getElementById('btn-next-ch').onclick = () => navigateChannel(1);
 
 function closePlayer(){
+  clearTimeout(autoFullscreenTimer);
   document.getElementById('player-wrap').classList.remove('active');
   document.getElementById('frame').src = '';
   document.getElementById('player-error').style.display = 'none';
