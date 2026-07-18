@@ -25,22 +25,14 @@
   header{
     padding:20px 20px 8px;
     text-align:center;
-    position:sticky;
-    top:0;
     background:var(--bg);
-    z-index:5;
   }
   header h1{
     margin:0;
-    font-size:1.4rem;
+    font-size:1rem;
     letter-spacing:0.5px;
   }
   header h1 span{color:var(--accent);}
-  header p{
-    color:var(--muted);
-    font-size:0.8rem;
-    margin:5px 0 12px;
-  }
   .tabs{
     display:flex;
     gap:6px;
@@ -172,6 +164,25 @@
     pointer-events:none;
   }
   .video-spinner.active{display:flex;}
+  .auto-fs-prompt{
+    position:absolute;
+    left:50%; bottom:16px;
+    transform:translateX(-50%);
+    display:none;
+    align-items:center;
+    gap:8px;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:24px;
+    padding:10px 18px;
+    font-size:0.85rem;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,0.4);
+    z-index:3;
+  }
+  .auto-fs-prompt.active{display:flex;}
   .video-spinner::after{
     content:"";
     width:34px; height:34px;
@@ -365,7 +376,6 @@
 
 <header>
   <h1><span>●</span> Ελληνική Τηλεόραση <span>Live</span></h1>
-  <p>Προσωπική συλλογή — όλα τα κανάλια, οργανωμένα ανά κατηγορία</p>
   <div class="tabs" id="tabs"></div>
 </header>
 
@@ -382,6 +392,7 @@
       <div class="video-area">
         <video id="video" playsinline></video>
         <div class="video-spinner" id="video-spinner"></div>
+        <button id="auto-fs-prompt" class="auto-fs-prompt" title="Πλήρης οθόνη">⛶ Πλήρης οθόνη</button>
       </div>
     </div>
     <iframe id="frame" src="" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -623,6 +634,7 @@ function onFullscreenChange(){
   if(isFullscreen()){
     btnFs.textContent = '🗗';
     showControlsOverlay();
+    hideAutoFsPrompt();
   } else {
     btnFs.textContent = '⛶';
     playerBox.classList.remove('controls-visible');
@@ -718,15 +730,32 @@ function openPlayer(ch){
 }
 
 let autoFullscreenTimer = null;
+let autoFsPromptHideTimer = null;
+const autoFsPrompt = document.getElementById('auto-fs-prompt');
+
+function hideAutoFsPrompt(){
+  autoFsPrompt.classList.remove('active');
+  clearTimeout(autoFsPromptHideTimer);
+}
 
 function scheduleAutoFullscreen(){
   clearTimeout(autoFullscreenTimer);
+  hideAutoFsPrompt();
   autoFullscreenTimer = setTimeout(() => {
+    // Browsers only allow requestFullscreen() as a direct result of a user gesture —
+    // a delayed call like this one is always rejected, so we ask for one tap instead.
     if(isFullscreen()) return;
-    const req = (playerBox.requestFullscreen || playerBox.webkitRequestFullscreen).call(playerBox);
-    if(req && req.catch) req.catch(() => {});
+    if(document.getElementById('video-controls').classList.contains('iframe-mode')) return;
+    autoFsPrompt.classList.add('active');
+    autoFsPromptHideTimer = setTimeout(hideAutoFsPrompt, 8000);
   }, 10000);
 }
+
+autoFsPrompt.onclick = () => {
+  hideAutoFsPrompt();
+  const req = (playerBox.requestFullscreen || playerBox.webkitRequestFullscreen).call(playerBox);
+  if(req && req.catch) req.catch(() => {});
+};
 
 function navigateChannel(delta){
   const list = getCategoryChannels(currentCat);
@@ -742,6 +771,7 @@ document.getElementById('btn-next-ch').onclick = () => navigateChannel(1);
 
 function closePlayer(){
   clearTimeout(autoFullscreenTimer);
+  hideAutoFsPrompt();
   document.getElementById('player-wrap').classList.remove('active');
   document.getElementById('frame').src = '';
   document.getElementById('player-error').style.display = 'none';
