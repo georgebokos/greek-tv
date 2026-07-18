@@ -368,7 +368,6 @@ const categories = {
   "Παιδικά": [
     { name:"ΕΡΤ Kids", url:"https://www.ert.gr/tv-live/kids/" },
     { name:"WZRA Kids TV", url:g("WZRA Kids TV live") },
-    { name:"Kids TV CY", url:g("Kids TV Cyprus live") },
     { name:"Duck TV", url:g("Duck TV kids channel live") },
     { name:"Mr Bean Kids", url:g("Mr Bean Kids channel live") },
   ],
@@ -379,23 +378,6 @@ const categories = {
     { name:"Sierra Channel", url:g("Sierra Channel live") },
     { name:"Dipolo TV HD", url:g("Dipolo TV live") },
   ],
-  "Κύπρος": [
-    { name:"RIK 1", url:"https://tv.rik.cy/live-tv/rik-1/" },
-    { name:"RIK 2", url:"https://tv.rik.cy/live-tv/rik-2/" },
-    { name:"RIK HD", url:"https://tv.rik.cy/live-tv/rik-hd/" },
-    { name:"Alpha Cyprus", url:"https://www.alphacyprus.com.cy/live" },
-    { name:"ANT1 Cyprus", url:"https://www.ant1live.com/webtv/live" },
-    { name:"Sigma CY", url:"https://www.sigmatv.com/live", hls:"https://sl2.sigmatv.com/hls/live.m3u8" },
-    { name:"Omega", url:"https://www.omegatv.com.cy/live/" },
-    { name:"Vergina CY", url:g("Vergina TV Κύπρου live") },
-    { name:"Βουλή TV Κύπρου", url:g("Βουλή τηλεόραση Κύπρου live") },
-    { name:"Alfa Sports CY", url:g("Alfa Sports Κύπρου live") },
-    { name:"Faros 1 CY", url:g("Faros 1 Κύπρου live") },
-    { name:"Faros 2 CY", url:g("Faros 2 Κύπρου live") },
-    { name:"Plus TV CY", url:g("Plus TV Κύπρου live") },
-    { name:"Xplore", url:g("Xplore TV Κύπρου live") },
-    { name:"One Channel CY", url:g("One Channel Κύπρου live") },
-  ],
 };
 
 const knownDomains = new Set([
@@ -403,8 +385,7 @@ const knownDomains = new Set([
   "Action 24","Kontra","Naftemporiki TV","One Channel","Blue Sky",
   "ΕΡΤ Sports 1","ΕΡΤ Sports 2","ΕΡΤ Sports 3","Open Sport","Mad TV",
   "ΕΡΤ 90s Radio","ΕΡΤ Vintage Radio","ΕΡΤ 80s Radio","ΕΡΤ Kids",
-  "Ant1 Drama","ANT1 Comedy",
-  "RIK 1","RIK 2","RIK HD","Alpha Cyprus","ANT1 Cyprus","Sigma CY","Omega"
+  "Ant1 Drama","ANT1 Comedy"
 ]);
 
 const tabsEl = document.getElementById('tabs');
