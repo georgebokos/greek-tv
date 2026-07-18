@@ -258,7 +258,12 @@
     background:rgba(0,0,0,0.45);
     border-top:none;
     justify-content:center;
-    gap:32px;
+    align-content:center;
+    flex-wrap:wrap;
+    row-gap:16px;
+    column-gap:clamp(10px, 3vw, 32px);
+    padding:16px;
+    box-sizing:border-box;
     opacity:0;
     pointer-events:none;
     transition:opacity 0.2s ease;
@@ -270,24 +275,24 @@
   }
   .player-box:fullscreen .vc-btn,
   .player-box:-webkit-full-screen .vc-btn{
-    font-size:2.2rem;
-    padding:10px 16px;
+    font-size:clamp(1.3rem, 6vw, 2.2rem);
+    padding:clamp(6px, 2vw, 10px) clamp(8px, 3vw, 16px);
   }
   .player-box:fullscreen .nav-btn,
   .player-box:-webkit-full-screen .nav-btn{
-    font-size:1.7rem;
-    padding:12px 20px;
+    font-size:clamp(1.1rem, 4.5vw, 1.7rem);
+    padding:clamp(8px, 2.5vw, 12px) clamp(10px, 3.5vw, 20px);
     border-width:2px;
     border-radius:12px;
   }
   .player-box:fullscreen .vc-volume-wrap,
   .player-box:-webkit-full-screen .vc-volume-wrap{
     width:28px;
-    height:100px;
+    height:clamp(60px, 15vw, 100px);
   }
   .player-box:fullscreen .vc-volume,
   .player-box:-webkit-full-screen .vc-volume{
-    width:100px;
+    width:clamp(60px, 15vw, 100px);
     height:24px;
   }
   .player-box:fullscreen .vc-live,
@@ -620,14 +625,24 @@ function showControlsOverlay(){
   controlsHideTimer = setTimeout(() => playerBox.classList.remove('controls-visible'), 3000);
 }
 
+function hideControlsOverlay(){
+  playerBox.classList.remove('controls-visible');
+  clearTimeout(controlsHideTimer);
+}
+
 videoArea.addEventListener('click', () => {
   if(!isFullscreen()) return;
   if(playerBox.classList.contains('controls-visible')){
-    playerBox.classList.remove('controls-visible');
-    clearTimeout(controlsHideTimer);
+    hideControlsOverlay();
   } else {
     showControlsOverlay();
   }
+});
+
+const videoControlsEl = document.getElementById('video-controls');
+videoControlsEl.addEventListener('click', (e) => {
+  if(!isFullscreen()) return;
+  if(e.target === videoControlsEl) hideControlsOverlay();
 });
 
 function onFullscreenChange(){
@@ -637,8 +652,7 @@ function onFullscreenChange(){
     hideAutoFsPrompt();
   } else {
     btnFs.textContent = '⛶';
-    playerBox.classList.remove('controls-visible');
-    clearTimeout(controlsHideTimer);
+    hideControlsOverlay();
   }
 }
 document.addEventListener('fullscreenchange', onFullscreenChange);
