@@ -146,12 +146,30 @@
     overflow:hidden;
     border:1px solid #232a38;
   }
-  .player-box iframe{
+  .player-box iframe, .player-box video{
     width:100%;
     height:56vw;
     max-height:480px;
     border:0;
     display:block;
+    background:#000;
+  }
+  .player-error{
+    padding:26px 18px;
+    text-align:center;
+    color:var(--muted);
+    font-size:0.85rem;
+    line-height:1.7;
+  }
+  .player-error a{
+    color:var(--text);
+    background:var(--accent);
+    padding:6px 12px;
+    border-radius:8px;
+    text-decoration:none;
+    font-size:0.78rem;
+    display:inline-block;
+    margin-top:6px;
   }
   .player-bar{
     display:flex;
@@ -214,7 +232,12 @@
         <button class="close-btn" onclick="closePlayer()">Κλείσιμο ✕</button>
       </div>
     </div>
+    <video id="video" controls playsinline style="display:none"></video>
     <iframe id="frame" src="" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <div id="player-error" class="player-error" style="display:none">
+      <p>Δεν ήταν δυνατή η άμεση αναπαραγωγή εδώ (πιθανός γεωγραφικός περιορισμός από το κανάλι).</p>
+      <a id="error-open" href="#" target="_blank" rel="noopener">Άνοιγμα επίσημης σελίδας ↗</a>
+    </div>
   </div>
 </div>
 
@@ -224,10 +247,12 @@
 <p class="note">
   Τα κανάλια με <b>"?"</b> δεν έχουν επιβεβαιωμένο επίσημο live-stream URL — το κουμπί σε αυτά ανοίγει αναζήτηση Google
   ώστε να βρεις εσύ την επίσημη σελίδα, αντί να μαντέψουμε λάθος διεύθυνση.
-  Όλα τα υπόλοιπα οδηγούν στα επίσημα, δωρεάν live feeds των ίδιων των καναλιών. Μερικά (π.χ. Alpha, ANT1) μπλοκάρουν
-  το embedding σε τρίτο site — χρησιμοποίησε τότε «Άνοιγμα σε καρτέλα».
+  Μερικά κανάλια (με το live σήμα να ξεκινάει αμέσως) παίζουν το πραγματικό live-stream τους απευθείας εδώ. Τα υπόλοιπα
+  ανοίγουν την επίσημη σελίδα του καναλιού σε ενσωματωμένο πλαίσιο — μερικές από αυτές (π.χ. Alpha, ANT1) μπλοκάρουν το
+  embedding, οπότε χρησιμοποίησε τότε «Άνοιγμα σε καρτέλα».
 </p>
 
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js"></script>
 <script>
 function g(name){ return "https://www.google.com/search?q=" + encodeURIComponent(name + " live streaming"); }
 
@@ -235,23 +260,23 @@ const categories = {
   "Πανελλαδικά": [
     { name:"ΕΡΤ1", url:"https://www.ert.gr/tv-live/" },
     { name:"ΕΡΤ2 Sports", url:"https://www.ert.gr/tv-live/ert2sport/" },
-    { name:"ΕΡΤ3", url:"https://www.ert.gr/tv-live/ert3/" },
-    { name:"ΕΡΤ News", url:"https://www.ert.gr/tv-live/ert-news/" },
+    { name:"ΕΡΤ3", url:"https://www.ert.gr/tv-live/ert3/", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/ERT3/default/index.m3u8" },
+    { name:"ΕΡΤ News", url:"https://www.ert.gr/tv-live/ert-news/", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/ERTNews/default/index.m3u8" },
     { name:"MEGA", url:"https://www.megatv.com/live/" },
-    { name:"ANT1", url:"https://www.antenna.gr/live" },
-    { name:"ALPHA", url:"https://www.alphatv.gr/live" },
+    { name:"ANT1", url:"https://www.antenna.gr/live", hls:"https://mcdn.antennaplus.gr/live/media0/Ant1/HLS/Ant1.m3u8" },
+    { name:"ALPHA", url:"https://www.alphatv.gr/live", hls:"https://alphatvlive2.siliconweb.com/alphatvlive/live_abr/playlist.m3u8" },
     { name:"STAR", url:"https://www.star.gr/livestreaming/" },
     { name:"OPEN Beyond", url:"https://www.open-tv.gr/live" },
     { name:"SKAI", url:"https://www.skai.gr/livestreaming" },
     { name:"Μακεδονία TV", url:"https://watch.antennaplus.gr/" },
-    { name:"Βουλή TV", url:"https://www.voulitv.gr/gr/live" },
+    { name:"Βουλή TV", url:"https://www.voulitv.gr/gr/live", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/VOULITV/default/index.m3u8" },
   ],
   "Περιφερειακά": [
     { name:"Action 24", url:"https://www.action24.gr/live" },
-    { name:"Kontra", url:"https://kontrachannel.gr/livetv-kontrachannel.html" },
-    { name:"Naftemporiki TV", url:"https://www.naftemporikitv.gr/live-tv/" },
-    { name:"One Channel", url:"https://onechannel.gr/live-tv/" },
-    { name:"Blue Sky", url:"https://blueskytv.gr/live-tv/" },
+    { name:"Kontra", url:"https://kontrachannel.gr/livetv-kontrachannel.html", hls:"https://kontralive.siliconweb.com/live/kontratv/playlist.m3u8" },
+    { name:"Naftemporiki TV", url:"https://www.naftemporikitv.gr/live-tv/", hls:"https://telmaco.ascdn.broadpeak.io/nafteboriki/default/index.m3u8" },
+    { name:"One Channel", url:"https://onechannel.gr/live-tv/", hls:"https://onechannel.siliconweb.com/one/stream/chunks.m3u8" },
+    { name:"Blue Sky", url:"https://blueskytv.gr/live-tv/", hls:"https://cdn5.smart-tv-data.com/bluesky/bluesky-live/playlist.m3u8" },
   ],
   "Αθλητικά": [
     { name:"ΕΡΤ Sports 1", url:"https://www.ert.gr/tv-live/ert-sports1/" },
@@ -287,7 +312,7 @@ const categories = {
     { name:"RIK HD", url:"https://tv.rik.cy/live-tv/rik-hd/" },
     { name:"Alpha Cyprus", url:"https://www.alphacyprus.com.cy/live" },
     { name:"ANT1 Cyprus", url:"https://www.ant1live.com/webtv/live" },
-    { name:"Sigma CY", url:"https://www.sigmatv.com/live" },
+    { name:"Sigma CY", url:"https://www.sigmatv.com/live", hls:"https://sl2.sigmatv.com/hls/live.m3u8" },
     { name:"Omega", url:"https://www.omegatv.com.cy/live/" },
     { name:"Vergina CY", url:g("Vergina TV Κύπρου live") },
     { name:"Βουλή TV Κύπρου", url:g("Βουλή τηλεόραση Κύπρου live") },
@@ -384,17 +409,72 @@ catNames.forEach(cat => {
   tabsEl.appendChild(tab);
 });
 
+let currentHls = null;
+
+function stopVideo(){
+  if(currentHls){ currentHls.destroy(); currentHls = null; }
+  const video = document.getElementById('video');
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+  video.style.display = 'none';
+}
+
+function showPlayerError(ch){
+  stopVideo();
+  document.getElementById('frame').style.display = 'none';
+  document.getElementById('frame').src = '';
+  document.getElementById('error-open').href = ch.url;
+  document.getElementById('player-error').style.display = 'block';
+}
+
+function playHls(ch){
+  const video = document.getElementById('video');
+  video.style.display = 'block';
+  video.muted = true;
+
+  if(video.canPlayType('application/vnd.apple.mpegurl')){
+    video.src = ch.hls;
+    video.play().catch(()=>{});
+  } else if(window.Hls && Hls.isSupported()){
+    const hls = new Hls();
+    currentHls = hls;
+    hls.on(Hls.Events.ERROR, (event, data) => {
+      if(data.fatal) showPlayerError(ch);
+    });
+    hls.loadSource(ch.hls);
+    hls.attachMedia(video);
+    video.play().catch(()=>{});
+  } else {
+    showPlayerError(ch);
+  }
+}
+
 function openPlayer(ch){
   document.getElementById('player-wrap').classList.add('active');
   document.getElementById('now-playing').textContent = ch.name;
-  document.getElementById('frame').src = ch.url;
   document.getElementById('open-tab').href = ch.url;
   document.getElementById('player-wrap').scrollIntoView({behavior:'smooth'});
+
+  stopVideo();
+  document.getElementById('player-error').style.display = 'none';
+  const frame = document.getElementById('frame');
+
+  if(ch.hls){
+    frame.style.display = 'none';
+    frame.src = '';
+    playHls(ch);
+  } else {
+    frame.style.display = 'block';
+    frame.src = ch.url;
+  }
 }
 
 function closePlayer(){
   document.getElementById('player-wrap').classList.remove('active');
   document.getElementById('frame').src = '';
+  document.getElementById('player-error').style.display = 'none';
+  stopVideo();
 }
 
 renderCategory(catNames[0]);
