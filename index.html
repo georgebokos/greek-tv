@@ -331,61 +331,62 @@ function g(name){ return "https://www.google.com/search?q=" + encodeURIComponent
 
 const categories = {
   "Πανελλαδικά": [
-    { name:"ΕΡΤ1", url:"https://www.ert.gr/tv-live/ert1/" },
-    { name:"ΕΡΤ2 Sports", url:"https://www.ert.gr/tv-live/ert2/" },
-    { name:"ΕΡΤ3", url:"https://www.ert.gr/tv-live/", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/ERT3/default/index.m3u8" },
-    { name:"ΕΡΤ News", url:"https://www.ert.gr/tv-live/ert-news/", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/ERTNews/default/index.m3u8" },
+    { name:"ΕΡΤ1", url:"https://www.ert.gr/tv-live/" },
+    { name:"ΕΡΤ2", url:"https://www.ert.gr/tv-live/" },
+    { name:"ΕΡΤ3", url:"https://www.ert.gr/tv-live/" },
+    { name:"ΕΡΤ News", url:"https://www.ert.gr/tv-live/", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/ERTNews/default/index.m3u8" },
+    { name:"ΕΡΤ Cosmos", url:"https://www.ert.gr/tv-live/", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/ERTCosmos/default/index.m3u8" },
     { name:"MEGA", url:"https://www.megatv.com/live/" },
     { name:"ANT1", url:"https://www.antenna.gr/live", hls:"https://mcdn.antennaplus.gr/live/media0/Ant1/HLS/Ant1.m3u8" },
     { name:"ALPHA", url:"https://www.alphatv.gr/live", hls:"https://alphatvlive2.siliconweb.com/alphatvlive/live_abr/playlist.m3u8" },
-    { name:"STAR", url:"https://www.star.gr/tv/live-stream" },
+    { name:"STAR", url:"https://www.star.gr/tv/live-stream", hls:"https://livestar.siliconweb.com/starvod/star4/star4.m3u8" },
     { name:"OPEN Beyond", url:"https://www.tvopen.gr/live" },
-    { name:"SKAI", url:"https://www.skai.gr/tv/live" },
+    { name:"SKAI", url:"https://www.skai.gr/tv/live", hls:"https://skai-live.siliconweb.com/media/cambria4/index.m3u8" },
     { name:"Μακεδονία TV", url:"https://watch.antennaplus.gr/" },
     { name:"Βουλή TV", url:"https://www.hellenicparliament.gr/", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/VOULITV/default/index.m3u8" },
   ],
   "Περιφερειακά": [
-    { name:"Action 24", url:"https://www.action24.gr/live-stream" },
+    { name:"Action 24", url:"https://www.action24.gr/live-stream", hls:"https://actionlive.siliconweb.com/actionabr/actiontv/playlist.m3u8" },
     { name:"Kontra", url:"https://kontrachannel.gr/livetv-kontrachannel.html", hls:"https://kontralive.siliconweb.com/live/kontratv/playlist.m3u8" },
     { name:"Naftemporiki TV", url:"https://www.naftemporikitv.gr/live-tv/", hls:"https://telmaco.ascdn.broadpeak.io/nafteboriki/default/index.m3u8" },
     { name:"One Channel", url:"https://onechannel.gr/live-tv/", hls:"https://onechannel.siliconweb.com/one/stream/chunks.m3u8" },
     { name:"Blue Sky", url:"https://blueskytv.gr/live-tv/", hls:"https://cdn5.smart-tv-data.com/bluesky/bluesky-live/playlist.m3u8" },
   ],
   "Αθλητικά": [
-    { name:"ΕΡΤ Sports 1", url:"https://www.ert.gr/tv-live/ert-sports/" },
-    { name:"ΕΡΤ Sports 2", url:"https://www.ert.gr/tv-live/ert-sports/" },
-    { name:"ΕΡΤ Sports 3", url:"https://www.ert.gr/tv-live/ert-sports/" },
-    { name:"Open Sport", url:"https://www.tvopen.gr/live" },
+    { name:"ΕΡΤ Sports 1", url:"https://www.ert.gr/tv-live/", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/ERTSports1/default/index.m3u8" },
+    { name:"ΕΡΤ Sports 2", url:"https://www.ert.gr/tv-live/", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/ERTSports2/default/index.m3u8" },
+    { name:"ΕΡΤ Sports 3", url:"https://www.ert.gr/tv-live/", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/ERTSports3/default/index.m3u8" },
     { name:"Poker TV", url:g("Poker TV Ελλάδα live") },
   ],
   "Μουσική": [
     { name:"Mad TV", url:"https://www.mad.gr/madtv/" },
-    { name:"ΕΡΤ 90s Radio", url:"https://www.ert.gr/radio/" },
-    { name:"ΕΡΤ Vintage Radio", url:"https://www.ert.gr/radio/" },
-    { name:"ΕΡΤ 80s Radio", url:"https://www.ert.gr/radio/" },
+    { name:"ΕΡΤ 90s Radio", url:"https://www.ertecho.gr/radio/radio90s/" },
+    { name:"ΕΡΤ Vintage Radio", url:"https://www.ertecho.gr/radio/vintageradio/" },
+    { name:"ΕΡΤ 80s Radio", url:"https://www.ertecho.gr/radio/radio80s/" },
     { name:"Best of 80s", url:g("Best of 80s radio Ελλάδα") },
   ],
   "Παιδικά": [
-    { name:"ΕΡΤ Kids", url:"https://www.ert.gr/tv-live/kids/" },
+    { name:"ΕΡΤ Kids", url:"https://www.ert.gr/tv-live/", hls:"https://ert-ucdn.broadpeak-aas.com/bpk-tv/ERTKids/default/index.m3u8" },
     { name:"WZRA Kids TV", url:g("WZRA Kids TV live") },
     { name:"Duck TV", url:g("Duck TV kids channel live") },
     { name:"Mr Bean Kids", url:g("Mr Bean Kids channel live") },
   ],
   "Κινηματογράφος": [
+    { name:"Netmax", url:"https://netmaxtv.com/live/" },
+    { name:"Choice TV", url:"https://www.choicetv.gr/live" },
     { name:"Ant1 Drama", url:"https://watch.antennaplus.gr/" },
     { name:"ANT1 Comedy", url:"https://watch.antennaplus.gr/" },
-    { name:"Cinema Classics", url:g("Cinema Classics channel live") },
-    { name:"Sierra Channel", url:g("Sierra Channel live") },
-    { name:"Dipolo TV HD", url:g("Dipolo TV live") },
+    { name:"Cinema Classics", url:"https://vipotv.com/cinema-classics/" },
+    { name:"Sierra Channel", url:"https://www.tvgreeklive.com/channel/sierra-channel" },
   ],
 };
 
 const knownDomains = new Set([
-  "ΕΡΤ1","ΕΡΤ2 Sports","ΕΡΤ3","ΕΡΤ News","MEGA","ANT1","ALPHA","STAR","OPEN Beyond","SKAI","Βουλή TV","Μακεδονία TV",
+  "ΕΡΤ1","ΕΡΤ2","ΕΡΤ3","ΕΡΤ News","ΕΡΤ Cosmos","MEGA","ANT1","ALPHA","STAR","OPEN Beyond","SKAI","Βουλή TV","Μακεδονία TV",
   "Action 24","Kontra","Naftemporiki TV","One Channel","Blue Sky",
-  "ΕΡΤ Sports 1","ΕΡΤ Sports 2","ΕΡΤ Sports 3","Open Sport","Mad TV",
+  "ΕΡΤ Sports 1","ΕΡΤ Sports 2","ΕΡΤ Sports 3","Mad TV",
   "ΕΡΤ 90s Radio","ΕΡΤ Vintage Radio","ΕΡΤ 80s Radio","ΕΡΤ Kids",
-  "Ant1 Drama","ANT1 Comedy"
+  "Ant1 Drama","ANT1 Comedy","Netmax","Choice TV"
 ]);
 
 const tabsEl = document.getElementById('tabs');
