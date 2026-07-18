@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ελληνική Τηλεόραση — Live</title>
+<style>
+  :root{
+    --bg:#0b0e14;
+    --card:#151a24;
+    --card-hover:#1d2432;
+    --accent:#e0393e;
+    --text:#eef1f6;
+    --muted:#8a93a6;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:radial-gradient(circle at top, #131722, var(--bg) 60%);
+    color:var(--text);
+    min-height:100vh;
+    padding-bottom:30px;
+  }
+  header{
+    padding:20px 20px 8px;
+    text-align:center;
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    z-index:5;
+  }
+  header h1{
+    margin:0;
+    font-size:1.4rem;
+    letter-spacing:0.5px;
+  }
+  header h1 span{color:var(--accent);}
+  header p{
+    color:var(--muted);
+    font-size:0.8rem;
+    margin:5px 0 12px;
+  }
+  .tabs{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding-bottom:8px;
+    scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    flex:0 0 auto;
+    padding:7px 14px;
+    border-radius:20px;
+    background:var(--card);
+    border:1px solid #232a38;
+    color:var(--muted);
+    font-size:0.8rem;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .tab.active{
+    background:var(--accent);
+    color:#fff;
+    border-color:var(--accent);
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(130px,1fr));
+    gap:12px;
+    padding:16px 18px;
+    max-width:950px;
+    margin:0 auto;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid #232a38;
+    border-radius:14px;
+    padding:14px 8px;
+    text-align:center;
+    cursor:pointer;
+    transition:transform .15s ease, background .15s ease;
+    user-select:none;
+    position:relative;
+  }
+  .card:active{transform:scale(0.96);}
+  .card:hover{background:var(--card-hover); border-color:var(--accent);}
+  .card .logo{
+    font-size:1rem;
+    font-weight:700;
+    margin-bottom:5px;
+    line-height:1.2;
+  }
+  .card .tag{
+    font-size:0.65rem;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  .card.unverified::after{
+    content:"?";
+    position:absolute;
+    top:6px; right:8px;
+    font-size:0.65rem;
+    color:var(--muted);
+  }
+  .live-dot{
+    display:inline-block;
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--accent);
+    margin-right:4px;
+    box-shadow:0 0 6px var(--accent);
+  }
+  #player-wrap{
+    display:none;
+    max-width:950px;
+    margin:0 auto 10px;
+    padding:0 18px;
+  }
+  #player-wrap.active{display:block;}
+  .player-box{
+    position:relative;
+    background:#000;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid #232a38;
+  }
+  .player-box iframe{
+    width:100%;
+    height:56vw;
+    max-height:480px;
+    border:0;
+    display:block;
+  }
+  .player-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 14px;
+    font-size:0.85rem;
+    color:var(--muted);
+  }
+  .player-bar a{
+    color:var(--text);
+    background:var(--accent);
+    padding:6px 12px;
+    border-radius:8px;
+    text-decoration:none;
+    font-size:0.78rem;
+  }
+  .close-btn{
+    background:none;
+    border:1px solid var(--muted);
+    color:var(--muted);
+    border-radius:8px;
+    padding:6px 10px;
+    font-size:0.78rem;
+    cursor:pointer;
+  }
+  .cat-title{
+    max-width:950px;
+    margin:14px auto 0;
+    padding:0 18px;
+    color:var(--muted);
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+  }
+  .note{
+    max-width:950px;
+    margin:20px auto 0;
+    padding:0 18px;
+    color:var(--muted);
+    font-size:0.72rem;
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span>●</span> Ελληνική Τηλεόραση <span>Live</span></h1>
+  <p>Προσωπική συλλογή — όλα τα κανάλια, οργανωμένα ανά κατηγορία</p>
+  <div class="tabs" id="tabs"></div>
+</header>
+
+<div id="player-wrap">
+  <div class="player-box">
+    <div class="player-bar">
+      <span><span class="live-dot"></span><span id="now-playing">—</span></span>
+      <div style="display:flex; gap:8px;">
+        <a id="open-tab" href="#" target="_blank" rel="noopener">Άνοιγμα σε καρτέλα ↗</a>
+        <button class="close-btn" onclick="closePlayer()">Κλείσιμο ✕</button>
+      </div>
+    </div>
+    <iframe id="frame" src="" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+</div>
+
+<div class="cat-title" id="cat-title">Πανελλαδικά</div>
+<div class="grid" id="grid"></div>
+
+<p class="note">
+  Τα κανάλια με <b>"?"</b> δεν έχουν επιβεβαιωμένο επίσημο live-stream URL — το κουμπί σε αυτά ανοίγει αναζήτηση Google
+  ώστε να βρεις εσύ την επίσημη σελίδα, αντί να μαντέψουμε λάθος διεύθυνση.
+  Όλα τα υπόλοιπα οδηγούν στα επίσημα, δωρεάν live feeds των ίδιων των καναλιών. Μερικά (π.χ. Alpha, ANT1) μπλοκάρουν
+  το embedding σε τρίτο site — χρησιμοποίησε τότε «Άνοιγμα σε καρτέλα».
+</p>
+
+<script>
+function g(name){ return "https://www.google.com/search?q=" + encodeURIComponent(name + " live streaming"); }
+
+const categories = {
+  "Πανελλαδικά": [
+    { name:"ΕΡΤ1", url:"https://www.ert.gr/tv-live/" },
+    { name:"ΕΡΤ2 Sports", url:"https://www.ert.gr/tv-live/ert2sport/" },
+    { name:"ΕΡΤ3", url:"https://www.ert.gr/tv-live/ert3/" },
+    { name:"ΕΡΤ News", url:"https://www.ert.gr/tv-live/ert-news/" },
+    { name:"MEGA", url:"https://www.megatv.com/live/" },
+    { name:"ANT1", url:"https://www.antenna.gr/live" },
+    { name:"ALPHA", url:"https://www.alphatv.gr/live" },
+    { name:"STAR", url:"https://www.star.gr/livestreaming/" },
+    { name:"OPEN Beyond", url:"https://www.open-tv.gr/live" },
+    { name:"SKAI", url:"https://www.skai.gr/livestreaming" },
+    { name:"Μακεδονία TV", url:"https://watch.antennaplus.gr/" },
+    { name:"Βουλή TV", url:"https://www.voulitv.gr/gr/live" },
+  ],
+  "Περιφερειακά": [
+    { name:"Action 24", url:"https://www.action24.gr/live" },
+    { name:"Kontra", url:"https://kontrachannel.gr/livetv-kontrachannel.html" },
+    { name:"Naftemporiki TV", url:"https://www.naftemporikitv.gr/live-tv/" },
+    { name:"One Channel", url:"https://onechannel.gr/live-tv/" },
+    { name:"Blue Sky", url:"https://blueskytv.gr/live-tv/" },
+  ],
+  "Αθλητικά": [
+    { name:"ΕΡΤ Sports 1", url:"https://www.ert.gr/tv-live/ert-sports1/" },
+    { name:"ΕΡΤ Sports 2", url:"https://www.ert.gr/tv-live/ert-sports2/" },
+    { name:"ΕΡΤ Sports 3", url:"https://www.ert.gr/tv-live/ert-sports3/" },
+    { name:"Open Sport", url:"https://www.open-tv.gr/live" },
+    { name:"Poker TV", url:g("Poker TV Ελλάδα live") },
+  ],
+  "Μουσική": [
+    { name:"Mad TV", url:"https://www.mad.tv/live" },
+    { name:"ΕΡΤ 90s Radio", url:"https://www.ert.gr/radio/" },
+    { name:"ΕΡΤ Vintage Radio", url:"https://www.ert.gr/radio/" },
+    { name:"ΕΡΤ 80s Radio", url:"https://www.ert.gr/radio/" },
+    { name:"Best of 80s", url:g("Best of 80s radio Ελλάδα") },
+  ],
+  "Παιδικά": [
+    { name:"ΕΡΤ Kids", url:"https://www.ert.gr/tv-live/ert-kids/" },
+    { name:"WZRA Kids TV", url:g("WZRA Kids TV live") },
+    { name:"Kids TV CY", url:g("Kids TV Cyprus live") },
+    { name:"Duck TV", url:g("Duck TV kids channel live") },
+    { name:"Mr Bean Kids", url:g("Mr Bean Kids channel live") },
+  ],
+  "Κινηματογράφος": [
+    { name:"Ant1 Drama", url:"https://watch.antennaplus.gr/" },
+    { name:"ANT1 Comedy", url:"https://watch.antennaplus.gr/" },
+    { name:"Cinema Classics", url:g("Cinema Classics channel live") },
+    { name:"Sierra Channel", url:g("Sierra Channel live") },
+    { name:"Dipolo TV HD", url:g("Dipolo TV live") },
+  ],
+  "Κύπρος": [
+    { name:"RIK 1", url:"https://tv.rik.cy/live-tv/rik-1/" },
+    { name:"RIK 2", url:"https://tv.rik.cy/live-tv/rik-2/" },
+    { name:"RIK HD", url:"https://tv.rik.cy/live-tv/rik-hd/" },
+    { name:"Alpha Cyprus", url:"https://www.alphacyprus.com.cy/live" },
+    { name:"ANT1 Cyprus", url:"https://www.ant1live.com/webtv/live" },
+    { name:"Sigma CY", url:"https://www.sigmatv.com/live" },
+    { name:"Omega", url:"https://www.omegatv.com.cy/live/" },
+    { name:"Vergina CY", url:g("Vergina TV Κύπρου live") },
+    { name:"Βουλή TV Κύπρου", url:g("Βουλή τηλεόραση Κύπρου live") },
+    { name:"Alfa Sports CY", url:g("Alfa Sports Κύπρου live") },
+    { name:"Faros 1 CY", url:g("Faros 1 Κύπρου live") },
+    { name:"Faros 2 CY", url:g("Faros 2 Κύπρου live") },
+    { name:"Plus TV CY", url:g("Plus TV Κύπρου live") },
+    { name:"Xplore", url:g("Xplore TV Κύπρου live") },
+    { name:"One Channel CY", url:g("One Channel Κύπρου live") },
+  ],
+};
+
+const knownDomains = new Set([
+  "ΕΡΤ1","ΕΡΤ2 Sports","ΕΡΤ3","ΕΡΤ News","MEGA","ANT1","ALPHA","STAR","OPEN Beyond","SKAI","Βουλή TV","Μακεδονία TV",
+  "Action 24","Kontra","Naftemporiki TV","One Channel","Blue Sky",
+  "ΕΡΤ Sports 1","ΕΡΤ Sports 2","ΕΡΤ Sports 3","Open Sport","Mad TV",
+  "ΕΡΤ 90s Radio","ΕΡΤ Vintage Radio","ΕΡΤ 80s Radio","ΕΡΤ Kids",
+  "Ant1 Drama","ANT1 Comedy",
+  "RIK 1","RIK 2","RIK HD","Alpha Cyprus","ANT1 Cyprus","Sigma CY","Omega"
+]);
+
+const tabsEl = document.getElementById('tabs');
+const gridEl = document.getElementById('grid');
+const titleEl = document.getElementById('cat-title');
+const catNames = Object.keys(categories);
+
+function renderCategory(cat){
+  titleEl.textContent = cat;
+  gridEl.innerHTML = '';
+  categories[cat].forEach(ch => {
+    const card = document.createElement('div');
+    card.className = 'card' + (knownDomains.has(ch.name) ? '' : ' unverified');
+    card.innerHTML = `<div class="logo">${ch.name}</div><div class="tag"><span class="live-dot"></span>Live</div>`;
+    card.onclick = () => openPlayer(ch);
+    gridEl.appendChild(card);
+  });
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.cat === cat));
+}
+
+catNames.forEach(cat => {
+  const tab = document.createElement('div');
+  tab.className = 'tab';
+  tab.textContent = cat;
+  tab.dataset.cat = cat;
+  tab.onclick = () => renderCategory(cat);
+  tabsEl.appendChild(tab);
+});
+
+function openPlayer(ch){
+  document.getElementById('player-wrap').classList.add('active');
+  document.getElementById('now-playing').textContent = ch.name;
+  document.getElementById('frame').src = ch.url;
+  document.getElementById('open-tab').href = ch.url;
+  document.getElementById('player-wrap').scrollIntoView({behavior:'smooth'});
+}
+
+function closePlayer(){
+  document.getElementById('player-wrap').classList.remove('active');
+  document.getElementById('frame').src = '';
+}
+
+renderCategory(catNames[0]);
+</script>
+
+</body>
+</html>
