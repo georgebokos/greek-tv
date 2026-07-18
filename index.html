@@ -419,6 +419,7 @@
       <a id="error-open" href="#" target="_blank" rel="noopener">Άνοιγμα επίσημης σελίδας ↗</a>
     </div>
     <div class="video-controls" id="video-controls">
+      <button id="btn-back-menu" class="nav-btn" title="Πίσω στο μενού">✕ Μενού</button>
       <button id="btn-prev-ch" class="nav-btn" title="Προηγούμενο κανάλι">⏮</button>
       <button id="btn-play" class="vc-btn hls-only" title="Play/Pause">⏸</button>
       <button id="btn-next-ch" class="nav-btn" title="Επόμενο κανάλι">⏭</button>
@@ -794,6 +795,12 @@ function navigateChannel(delta){
 
 document.getElementById('btn-prev-ch').onclick = () => navigateChannel(-1);
 document.getElementById('btn-next-ch').onclick = () => navigateChannel(1);
+document.getElementById('btn-back-menu').onclick = () => {
+  if(isFullscreen()){
+    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  }
+  closePlayer();
+};
 
 function closePlayer(){
   clearTimeout(autoFullscreenTimer);
