@@ -165,6 +165,35 @@
     pointer-events:none;
   }
   .video-spinner.active{display:flex;}
+  .nav-overlay-btn{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    background:rgba(0,0,0,0.45);
+    color:#fff;
+    border:none;
+    border-radius:50%;
+    width:48px; height:48px;
+    font-size:1.3rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.2s ease, background 0.2s ease;
+    z-index:2;
+  }
+  .nav-overlay-btn:hover{background:rgba(0,0,0,0.65);}
+  .video-area.nav-overlay-visible .nav-overlay-btn{
+    opacity:1;
+    pointer-events:auto;
+  }
+  #btn-prev-overlay{left:10px;}
+  #btn-next-overlay{right:10px;}
+  .player-box:fullscreen .nav-overlay-btn,
+  .player-box:-webkit-full-screen .nav-overlay-btn{display:none;}
+  .player-box:not(:fullscreen):not(:-webkit-full-screen) .video-controls:not(.iframe-mode) .iframe-only{display:none;}
   .auto-fs-prompt{
     position:absolute;
     left:50%; top:16px;
@@ -409,6 +438,8 @@
         <div class="video-area">
           <video id="video" playsinline></video>
           <div class="video-spinner" id="video-spinner"></div>
+          <button id="btn-prev-overlay" class="nav-overlay-btn" title="Προηγούμενο κανάλι">⏮</button>
+          <button id="btn-next-overlay" class="nav-overlay-btn" title="Επόμενο κανάλι">⏭</button>
         </div>
       </div>
       <iframe id="frame" src="" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -420,9 +451,9 @@
     </div>
     <div class="video-controls" id="video-controls">
       <button id="btn-back-menu" class="nav-btn" title="Πίσω στο μενού">✕ Μενού</button>
-      <button id="btn-prev-ch" class="nav-btn" title="Προηγούμενο κανάλι">⏮</button>
+      <button id="btn-prev-ch" class="nav-btn iframe-only" title="Προηγούμενο κανάλι">⏮</button>
       <button id="btn-play" class="vc-btn hls-only" title="Play/Pause">⏸</button>
-      <button id="btn-next-ch" class="nav-btn" title="Επόμενο κανάλι">⏭</button>
+      <button id="btn-next-ch" class="nav-btn iframe-only" title="Επόμενο κανάλι">⏭</button>
       <button id="btn-mute" class="vc-btn hls-only" title="Ήχος">🔊</button>
       <div class="vc-volume-wrap hls-only">
         <input id="vc-volume" type="range" min="0" max="1" step="0.05" value="1" class="vc-volume" title="Ένταση">
@@ -648,7 +679,28 @@ function hideControlsOverlay(){
   clearTimeout(controlsHideTimer);
 }
 
-videoArea.addEventListener('click', () => {
+let navOverlayHideTimer = null;
+
+function showNavOverlay(){
+  videoArea.classList.add('nav-overlay-visible');
+  clearTimeout(navOverlayHideTimer);
+  navOverlayHideTimer = setTimeout(() => videoArea.classList.remove('nav-overlay-visible'), 3000);
+}
+
+function hideNavOverlay(){
+  videoArea.classList.remove('nav-overlay-visible');
+  clearTimeout(navOverlayHideTimer);
+}
+
+videoArea.addEventListener('click', (e) => {
+  if(e.target.closest('.nav-overlay-btn')) return;
+
+  if(videoArea.classList.contains('nav-overlay-visible')){
+    hideNavOverlay();
+  } else {
+    showNavOverlay();
+  }
+
   if(!isFullscreen()) return;
   if(playerBox.classList.contains('controls-visible')){
     hideControlsOverlay();
@@ -656,6 +708,9 @@ videoArea.addEventListener('click', () => {
     showControlsOverlay();
   }
 });
+
+document.getElementById('btn-prev-overlay').onclick = (e) => { e.stopPropagation(); navigateChannel(-1); };
+document.getElementById('btn-next-overlay').onclick = (e) => { e.stopPropagation(); navigateChannel(1); };
 
 const videoControlsEl = document.getElementById('video-controls');
 videoControlsEl.addEventListener('click', (e) => {
@@ -809,6 +864,7 @@ document.getElementById('btn-back-menu').onclick = () => {
 function closePlayer(){
   clearTimeout(autoFullscreenTimer);
   hideAutoFsPrompt();
+  hideNavOverlay();
   document.getElementById('player-wrap').classList.remove('active');
   document.getElementById('frame').src = '';
   document.getElementById('player-error').style.display = 'none';
