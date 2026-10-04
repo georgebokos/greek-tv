@@ -529,10 +529,15 @@ const categories = {
     { name:"Netmax", url:"https://netmaxtv.com/live/", hls:"https://es1.crystalweb.net:1936/netmaxtv/netmaxtv/playlist.m3u8" },
     { name:"Ant1 Drama", url:"https://www.antenna.gr/livedrama" },
     { name:"ANT1 Comedy", url:"https://www.antenna.gr/livecomedy" },
-    { name:"Cinema Classics", url:"https://www.tvgreeklive.com/channel/cinema-classics", noEmbed:true },
-    { name:"Sierra Channel", url:"https://netnix.tv/countries/gr/channels/sierra-channel", noEmbed:true },
+    { name:"Cinema Classics", url:"https://www.tvgreeklive.com/channel/cinema-classics", hls:"https://tv.mediacp.eu:8081/cinemaclassics/index.m3u8" },
+    { name:"Sierra Channel", url:"https://netnix.tv/countries/gr/channels/sierra-channel", hls:"https://fr.crystalweb.net:1936/sierra/sierra/playlist.m3u8" },
     { name:"Diavata TV", url:"https://diavatatv.weebly.com/live.html", hls:"https://183.bozztv.com/giatv/giatv-diavatatvonline/diavatatvonline/playlist.m3u8" },
     { name:"Lampsi TV", url:"https://www.lampsitv.eu/" },
+    { name:"Groovy", url:"https://www.tvgreeklive.com/channel/groovy", hls:"http://web.onair-radio.eu:1935/groovytv/groovytv/playlist.m3u8" },
+    { name:"Village World", url:"https://www.tvgreeklive.com/channel/village-world", hls:"https://ellastvmax.gotdns.com/freetv/village-world/index.m3u8" },
+    { name:"Ellas World", url:"https://www.tvgreeklive.com/channel/ellas-world", hls:"https://ellastvmax.ath.cx/freetv/promo/index.m3u8" },
+    { name:"NETV Europe", url:"https://www.tvgreeklive.com/channel/netv-europe-hd", hls:"https://neon.streams.gr:8081/netveurope/index.m3u8" },
+    { name:"NETV Toronto", url:"https://www.tvgreeklive.com/channel/netv-toronto-hd", hls:"https://eu1.streams.gr:8081/netvtoronto/index.m3u8" },
   ],
 };
 
@@ -541,7 +546,7 @@ const knownDomains = new Set([
   "Action 24","Kontra","Naftemporiki TV","One Channel","Blue Sky","Zougla TV","Κρήτη TV",
   "ΕΡΤ Sports 1","ΕΡΤ Sports 2","ΕΡΤ Sports 3","Mad TV",
   "ΕΡΤ 90s Radio","ΕΡΤ Vintage Radio","ΕΡΤ 80s Radio","ΕΡΤ Kids",
-  "Netmax","Ant1 Drama","ANT1 Comedy","Diavata TV","Lampsi TV"
+  "Netmax","Ant1 Drama","ANT1 Comedy","Diavata TV","Lampsi TV","Sierra Channel","Village World","Ellas World"
 ]);
 
 const tabsEl = document.getElementById('tabs');
